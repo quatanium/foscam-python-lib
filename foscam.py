@@ -1,15 +1,10 @@
 """
-A module to exploit Foscam Foscam HD816W camera.
+A module to exploit Foscam Foscam HD816W/FC2402P camera.
 """
 
 import urllib
 import xml.etree.ElementTree as ET
 from threading import Thread
-
-from os import path
-#CUR_PATH = path.dirname(path.dirname(path.realpath(__file__)))
-#import sys
-#sys.path.append(CUR_PATH)
 
 ERROR_FOSCAM_UNKNOWN = 0
 ERROR_FOSCAM_UNAVAILABLE = 1
@@ -102,6 +97,7 @@ class FoscamCamera(object):
         if self.daemon:
             t = Thread(target=execute_with_callbacks,
                     args=(cmd, ), kwargs={'params':params, 'callback':callback})
+            t.daemon = True
             t.start()
         else:
             return execute_with_callbacks(cmd, params, callback)
@@ -357,8 +353,23 @@ class FoscamCamera(object):
         '''
         Set camera name
         '''
-        params = {'devName': devname}
+        params = {'devName': devname.encode('gbk')}
         return self.execute_command('setDevName', params, callback=callback)
+
+    def get_dev_state(self, callback=None):
+        '''
+        Get all device state
+        cmd: getDevState
+        return args:
+            ......
+            record:      0   Not in recording; 1 Recording
+            sdState:     0   No sd card; 1 Sd card OK; 2 SD card read only
+            sdFreeSpace: Free space of sd card by unit of k
+            sdTotalSpace: Total space of sd card by unit of k
+            ......
+        '''
+        return self.execute_command('getDevState', callback=callback)
+
 
     # *************** PTZ Control *******************
 
@@ -434,3 +445,124 @@ class FoscamCamera(object):
         '''
         return self.execute_command('setPTZSpeed', {'speed':speed},
                                          callback=callback)
+
+    def get_ptz_selftestmode(self, callback=None):
+        '''
+        Get the selftest mode of PTZ
+        '''
+        return self.execute_command('getPTZSelfTestMode', callback=callback)
+
+    def set_ptz_selftestmode(self, mode=0, callback=None):
+        '''
+        Set the selftest mode of PTZ
+        mode = 0: No selftest
+        mode = 1: Normal selftest
+        mode = 1: After normal selftest, then goto presetpoint-appointed
+        '''
+        return self.execute_command('setPTZSelfTestMode',
+                                    {'mode':mode},
+                                    callback=callback
+                                   )
+
+
+    # *************** AV Function *******************
+    def get_alarm_record_config(self, callback=None):
+        '''
+        Get alarm record config
+        '''
+        return self.execute_command('getAlarmRecordConfig', callback=callback)
+
+    def set_alarm_record_config(self, is_enable_prerecord=1,
+                                prerecord_secs=5, alarm_record_secs=300, callback=None):
+        '''
+        Set alarm record config
+        Return: set result(0-success, -1-error)
+        '''
+        params = {'isEnablePreRecord': is_enable_prerecord,
+                  'preRecordSecs'    : prerecord_secs,
+                  'alarmRecordSecs'  : alarm_record_secs
+                 }
+        return self.execute_command('setAlarmRecordConfig', params, callback=callback)
+
+    def get_local_alarm_record_config(self, callback=None):
+        '''
+        Get local alarm-record config
+        '''
+        return self.execute_command('getLocalAlarmRecordConfig', callback=callback)
+
+    def set_local_alarm_record_config(self, is_enable_local_alarm_record = 1,
+                                      local_alarm_record_secs = 30, callback=None):
+        '''
+        Set local alarm-record config
+        `is_enable_local_alarm_record`: 0 disable, 1 enable
+        '''
+        params = {'isEnableLocalAlarmRecord': is_enable_local_alarm_record,
+                  'localAlarmRecordSecs'    : local_alarm_record_secs}
+        return self.execute_command('setLocalAlarmRecordConfig', params, callback=callback)
+
+    def get_h264_frm_ref_mode(self, callback=None):
+        '''
+        Get grame shipping reference mode of H264 encode stream.
+        Return args:
+                mode: 0 Normal reference mode
+                      1 Two frames are seprated by four skipping frames
+        '''
+        return self.execute_command('getH264FrmRefMode', callback=callback)
+
+    def set_h264_frm_ref_mode(self, mode=1, callback=None):
+        '''
+        Set frame shipping reference mode of H264 encode stream.
+        params:
+            `mode`: see docstr of meth::get_h264_frm_ref_mode
+        '''
+        params = {'mode': mode}
+        return self.execute_command('setH264FrmRefMode', params, callback)
+
+    def get_schedule_record_config(self, callback=None):
+        '''
+        Get schedule record config.
+        cmd: getScheduleRecordConfig
+        Return args:
+                isEnable: 0/1
+                recordLevel: 0 ~ ?
+                spaceFullMode: 0 ~ ?
+                isEnableAudio: 0/1
+                schedule[N]: N <- (0 ~ 6)
+        '''
+        return self.execute_command('getScheduleRecordConfig', callback=callback)
+
+    def set_schedule_record_config(self, is_enable, record_level,
+                                   space_full_mode, is_enable_audio,
+                                   schedule0 = 0, schedule1 = 0, schedule2 = 0,
+                                   schedule3 = 0, schedule4 = 0, schedule5 = 0,
+                                   schedule6 = 0, callback=None):
+        '''
+        Set schedule record config.
+        cmd: setScheduleRecordConfig
+        args: See docstring of meth::get_schedule_record_config
+        '''
+
+        params = {'isEnable'     : is_enable,
+                  'isEnableAudio': is_enable_audio,
+                  'recordLevel'  : record_level,
+                  'spaceFullMode': space_full_mode,
+                  'schedule0'    : schedule0,
+                  'schedule1'    : schedule1,
+                  'schedule2'    : schedule2,
+                  'schedule3'    : schedule3,
+                  'schedule4'    : schedule4,
+                  'schedule5'    : schedule5,
+                  'schedule6'    : schedule6,
+                  }
+        return self.execute_command('setScheduleRecordConfig', params, callback=callback)
+
+    def get_record_path(self, callback=None):
+        '''
+        Get Record path: sd/ftp
+        cmd: getRecordPath
+        return args:
+            path: (0,SD), (1, FTP)
+            free: free size(K)
+            total: total size(K)
+        '''
+        return self.execute_command('getRecordPath', callback=callback)
