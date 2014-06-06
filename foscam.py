@@ -68,8 +68,12 @@ class FoscamCamera(object):
         if self.verbose:
             print 'Send Foscam command: %s' % cmdurl
         try:
-            root = ET.fromstring(urllib.urlopen(cmdurl).read())
-        except Exception:
+            raw_string = ''
+            raw_string = urllib.urlopen(cmdurl).read()
+            root = ET.fromstring(raw_string)
+        except:
+            if self.verbose:
+                print 'Foscam exception: ' + raw_string
             return ERROR_FOSCAM_UNAVAILABLE, None
         code = ERROR_FOSCAM_UNKNOWN
         params = dict()
@@ -297,7 +301,23 @@ class FoscamCamera(object):
                   'isVBR'     : isvbr
                  }
         return self.execute_command('setVideoStreamParam',
-                                         params, callback=callback)
+                                    params, callback=callback)
+
+    def mirror_video(self, is_mirror, callback=None):
+        '''
+        Mirror video
+       ``is_mirror``: 0 not mirror, 1 mirror
+        '''
+        params = {'isMirror': is_mirror}
+        return self.execute_command('mirrorVideo', params, callback=callback)
+
+    def flip_video(self, is_flip, callback=None):
+        '''
+        Flip video
+        ``is_flip``: 0 Not flip, 1 Filp
+        '''
+        params = {'isFlip': is_flip }
+        return self.execute_command('flipVideo', params, callback=callback)
 
 
     # *************** User account ******************
@@ -319,22 +339,39 @@ class FoscamCamera(object):
                   'oldPwd' : oldpwd,
                   'newPwd' : newpwd,
                  }
-        return self.execute_command('changePassword', params, callback=callback)
+        return self.execute_command('changePassword',
+                                    params, callback=callback)
 
     # *************** Device manage *******************
 
-    def set_system_time(self, ntp_server, callback=None):
+    def set_system_time(self, time_source, ntp_server, date_format,
+                        time_format, time_zone, is_dst, dst, year,
+                        mon, day, hour, minute, sec, callback=None):
         '''
-        Only support timeSource = 0(Get time from NTP server)
+        Set systeim time
         '''
         if ntp_server not in ['time.nist.gov',
                               'time.kriss.re.kr',
                               'time.windows.com',
                               'time.nuri.net',
-                              ]:
+                             ]:
             raise ValueError('Unsupported ntpServer')
 
-        params = {'timeSource': 0, 'ntpServer': ntp_server}
+        params = {'timeSource': time_source,
+                  'ntpServer' : ntp_server,
+                  'dateFormat': date_format,
+                  'timeFormat': time_format,
+                  'timeZone'  : time_zone,
+                  'isDst'     : is_dst,
+                  'dst'       : dst,
+                  'year'      : year,
+                  'mon'       : mon,
+                  'day'       : day,
+                  'hour'      : hour,
+                  'minute'    : minute,
+                  'sec'       : sec
+                 }
+
         return self.execute_command('setSystemTime', params, callback=callback)
 
     def get_system_time(self, callback=None):
