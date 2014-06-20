@@ -1,5 +1,5 @@
 """
-A module to exploit Foscam Foscam HD816W/FC2402P camera.
+A module to exploit Foscam Foscam FI9821W/P/HD816W/P camera.
 """
 
 import urllib
