@@ -57,6 +57,11 @@ class TestFoscam(unittest.TestCase):
         rc, args = self.foscam.flip_video(0)
         self.assertEqual(rc, 0)
 
+    def test_get_mirror_and_flip_setting(self):
+        rc, args = self.foscam.get_mirror_and_flip_setting()
+        self.assertEqual(rc, 0)
+
+
     # ***************** Test Network Functions *********************
     def test_get_ip_info(self):
         rc, info = self.foscam.get_ip_info()
@@ -74,10 +79,11 @@ class TestFoscam(unittest.TestCase):
         self.foscam.get_ip_info()
 
     def test_set_port(self):
-        self.foscam.get_port_info()
-        self.foscam.set_port_info(webport=88, mediaport=88, \
+        rc, args = self.foscam.get_port_info()
+        rc, args = self.foscam.set_port_info(webport=88, mediaport=88, \
                 httpsport=443, onvifport=888)
-        self.foscam.get_port_info()
+        self.assertEqual(rc, 0)
+        rc, args = self.foscam.get_port_info()
 
     def test_set_upnp(self):
         self.foscam.get_upnp_config()
@@ -259,6 +265,12 @@ class TestFoscam(unittest.TestCase):
         rc, args = self.foscam.get_record_path()
         self.assertTrue(rc == 0)
         self.assertTrue(set(args) == set(['path', 'free', 'total']))
+
+    def test_set_record_path(self):
+        rc, args = self.foscam.get_record_path()
+        self.assertTrue(rc == 0)
+        rc, args = self.foscam.set_record_path(path=0)
+        self.assertTrue(rc == 0)
 
 
     # ******************* Other *****************************

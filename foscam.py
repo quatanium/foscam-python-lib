@@ -319,6 +319,10 @@ class FoscamCamera(object):
         params = {'isFlip': is_flip }
         return self.execute_command('flipVideo', params, callback=callback)
 
+    def get_mirror_and_flip_setting(self, callback=None):
+
+        return self.execute_command('flipVideo', None, callback=callback)
+
 
     # *************** User account ******************
 
@@ -598,8 +602,18 @@ class FoscamCamera(object):
         Get Record path: sd/ftp
         cmd: getRecordPath
         return args:
-            path: (0,SD), (1, FTP)
+            path: (0,SD), (2, FTP)
             free: free size(K)
             total: total size(K)
         '''
         return self.execute_command('getRecordPath', callback=callback)
+
+    def set_record_path(self, path, callback=None):
+        '''
+        Set Record path: sd/ftp
+        cmd: setRecordPath
+        param:
+             path: (0,SD), (2, FTP)
+        '''
+        params = {'Path': path}
+        return self.execute_command('setRecordPath', params, callback=callback)
