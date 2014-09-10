@@ -321,7 +321,7 @@ class FoscamCamera(object):
 
     def get_mirror_and_flip_setting(self, callback=None):
 
-        return self.execute_command('flipVideo', None, callback=callback)
+        return self.execute_command('getMirrorAndFilpSetting', None, callback=callback)
 
 
     # *************** User account ******************

@@ -42,7 +42,7 @@ This example illustrates the use of a callback function when the command complet
             print 'Failed to get IPInfo!'
             return
         print 'IP: %s, Mask: %s' % (params['ip'], params['mask'])
-        
+
     mycam = FoscamCamera('192.168.0.110', 88, 'admin', 'foscam', daemon=False)
     mycam.get_ip_info(print_ipinfo)
 ```
