@@ -6,11 +6,6 @@ import urllib
 import xml.etree.ElementTree as ET
 from threading import Thread
 
-ERROR_FOSCAM_UNKNOWN = 0
-ERROR_FOSCAM_UNAVAILABLE = 1
-
-VERBOSE = True
-
 # Foscam error code.
 FOSCAM_SUCCESS           = 0
 ERROR_FOSCAM_FORMAT      = -1
@@ -32,7 +27,7 @@ class FoscamError(Exception):
 class FoscamCamera(object):
     '''A python implementation of the foscam HD816W'''
 
-    def __init__(self, host, port, usr, pwd, daemon=False, verbose=VERBOSE):
+    def __init__(self, host, port, usr, pwd, daemon=False, verbose=True):
         '''
         If ``daemon`` is True, the command will be sent unblockedly.
         '''
@@ -282,16 +277,17 @@ class FoscamCamera(object):
             framerate, gop, isvbr, callback=None):
         '''
         Set the video stream param of stream N
+        streamtype(0~3): Stream N.
         resolution(0~4): 0 720P,
                          1 VGA(640*480),
                          2 VGA(640*360),
                          3 QVGA(320*240),
-                         4 QVGA(320*180)
-        bitrate: Bit rate of stream type N(20480~2097152)
-        framerate: Frame rate of stream type N
+                         4 QVGA(320*180).
+        bitrate: Bit rate of stream type N(20480~2097152).
+        framerate: Frame rate of stream type N.
         GOP: P frames between 1 frame of stream type N.
              The suggest value is: X * framerate.
-        isvbr: 0(Not in use currently), 1(In use)
+        isvbr: 0(Not in use currently), 1(In use).
         '''
         params = {'streamType': streamtype,
                   'resolution': resolution,
@@ -314,14 +310,14 @@ class FoscamCamera(object):
     def flip_video(self, is_flip, callback=None):
         '''
         Flip video
-        ``is_flip``: 0 Not flip, 1 Filp
+        ``is_flip``: 0 Not flip, 1 Flip
         '''
         params = {'isFlip': is_flip }
         return self.execute_command('flipVideo', params, callback=callback)
 
     def get_mirror_and_flip_setting(self, callback=None):
 
-        return self.execute_command('getMirrorAndFilpSetting', None, callback=callback)
+        return self.execute_command('getMirrorAndFlipSetting', None, callback=callback)
 
 
     # *************** User account ******************
