@@ -503,6 +503,18 @@ class FoscamCamera(object):
 
 
     # *************** AV Function *******************
+    def get_motion_detect_config(self, callback=None):
+        '''
+        Get motion detect config
+        '''
+        return self.execute_command('getMotionDetectConfig', callback=callback)
+ 
+    def set_motion_detect_config(self, params, callback=None):
+        '''
+        Get motion detect config
+        '''
+        return self.execute_command('setMotionDetectConfig', params, callback=callback)
+
     def get_alarm_record_config(self, callback=None):
         '''
         Get alarm record config
