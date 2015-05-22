@@ -515,6 +515,26 @@ class FoscamCamera(object):
         '''
         return self.execute_command('setMotionDetectConfig', params, callback=callback)
 
+    def set_motion_detection(self, enabled=1):
+        '''
+        Get the current config and set the motion detection on or off
+        '''
+        result, current_config = self.get_motion_detect_config()
+        current_config['isEnable'] = enabled
+        self.set_motion_detect_config(current_config)
+
+    def enable_motion_detection(self):
+        '''
+        Enable motion detection
+        '''
+        self.set_motion_detection(1)
+
+    def disable_motion_detection(self):
+        '''
+        disable motion detection
+        '''
+        self.set_motion_detection(0)
+
     def get_alarm_record_config(self, callback=None):
         '''
         Get alarm record config
