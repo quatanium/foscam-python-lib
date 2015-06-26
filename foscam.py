@@ -59,7 +59,7 @@ class FoscamCamera(object):
                                                                   paramstr,
                                                                   )
 
-        # Parase parameters from response string.
+        # Parse parameters from response string.
         if self.verbose:
             print 'Send Foscam command: %s' % cmdurl
         try:
@@ -469,6 +469,19 @@ class FoscamCamera(object):
         Reset PT to default position.
         '''
         return self.execute_command('ptzReset', callback=callback)
+    
+    def ptz_get_preset(self, callback=None):
+        '''
+        Get presets.
+        '''
+        return self.execute_command('getPTZPresetPointList', callback=callback)
+    
+    def ptz_goto_preset(self, name, callback=None):
+        '''
+        Move to preset.
+        '''
+        params = {'name': name}
+        return self.execute_command('ptzGotoPresetPoint', params, callback=callback)
 
     def get_ptz_speed(self, callback=None):
         '''
@@ -501,7 +514,7 @@ class FoscamCamera(object):
                                     callback=callback
                                    )
 
-
+    
     # *************** AV Function *******************
     def get_motion_detect_config(self, callback=None):
         '''
