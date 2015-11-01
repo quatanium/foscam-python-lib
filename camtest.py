@@ -4,7 +4,7 @@ import os.path
 from time import sleep
 import ConfigParser
 
-from foscam import FoscamCamera
+from foscam import FoscamCamera, FOSCAM_SUCCESS
 
 config = ConfigParser.SafeConfigParser()
 config_filepath = os.path.join(os.path.dirname(__file__), "camtest.cfg")
@@ -21,6 +21,10 @@ CAM_PASS      = config_defaults.get('pass') or 'foscam'
 CAM_WIFI_SSID = config_defaults.get('wifi_ssid') or ''
 CAM_WIFI_PASS = config_defaults.get('wifi_pass') or ''
 
+class CallbackForTest(object):
+    def __call__(self, *args, **kwargs):
+        self.args = args
+        self.kwargs = kwargs;
 
 class TestFoscam(unittest.TestCase):
 
@@ -202,6 +206,26 @@ class TestFoscam(unittest.TestCase):
         rc, args = self.foscam.get_dev_state()
         self.assertEqual(rc, 0)
 
+    def test_open_infra_led(self):
+        rc, args = self.foscam.open_infra_led()
+        self.assertEqual(rc, 0)
+
+    def test_close_infra_led(self):
+        rc, args = self.foscam.close_infra_led()
+        self.assertEqual(rc, 0)
+
+    def test_get_infra_led_config(self):
+        rc, args = self.foscam.get_infra_led_config()
+        self.assertEqual(rc, 0)
+
+    def test_set_infra_led_config(self):
+        rc, args = self.foscam.set_infra_led_config(1)
+        self.assertEqual(rc, 0)
+
+    def test_get_product_all_info(self):
+        rc, args = self.foscam.get_product_all_info()
+        self.assertEqual(rc, 0)
+        self.assertIn('modelName', args)
 
     # ************ Test AV Function *************************
 
@@ -283,6 +307,9 @@ class TestFoscam(unittest.TestCase):
         rc, args = self.foscam.set_record_path(path=0)
         self.assertTrue(rc == 0)
 
+    def test_get_ptz_preset_point_list(self):
+        rc, args = self.foscam.get_ptz_preset_point_list()
+        self.assertTrue("point0" in args)
 
     # ******************* Other *****************************
     def test_unblocked_execute(self):
@@ -312,6 +339,29 @@ class TestFoscam(unittest.TestCase):
             sleep(0.5)
             timeout -= 0.5
         self.assertTrue(flag)
+
+
+    # *************** SnapPicture Function *******************
+
+    def test_snap_picture_2(self):
+        # also test callback with raw data
+        callback = CallbackForTest()
+        rc, data = self.foscam.snap_picture_2(callback=callback)
+        self.assertEqual(rc, FOSCAM_SUCCESS)
+        with open('test.jpg', 'wb') as fp:
+            fp.write(data)
+        self.assertSequenceEqual(callback.args, (rc, data))
+
+
+    # ********************** Misc ****************************
+
+    def test_get_log(self):
+        # also test callback with non-raw data
+        callback = CallbackForTest()
+        rc, args = self.foscam.get_log(0, callback=callback)
+        self.assertEqual(rc, FOSCAM_SUCCESS)
+        self.assertTrue('log0' in args)
+        self.assertSequenceEqual(callback.args, (rc, args))
 
 if __name__ == '__main__':
     unittest.main()

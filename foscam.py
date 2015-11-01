@@ -43,7 +43,7 @@ class FoscamCamera(object):
         _url = '%s:%s' % (self.host, self.port)
         return _url
 
-    def send_command(self, cmd, params=None):
+    def send_command(self, cmd, params=None, raw=False):
         '''
         Send command to foscam.
         '''
@@ -65,6 +65,10 @@ class FoscamCamera(object):
         try:
             raw_string = ''
             raw_string = urllib.urlopen(cmdurl).read()
+            if raw:
+                if self.verbose:
+                    print 'Returning raw Foscam response: len=%d' % len(raw_string)
+                return FOSCAM_SUCCESS, raw_string
             root = ET.fromstring(raw_string)
         except:
             if self.verbose:
@@ -83,23 +87,23 @@ class FoscamCamera(object):
             print 'Received Foscam response: %s, %s' % (code, params)
         return code, params
 
-    def execute_command(self, cmd, params=None, callback=None):
+    def execute_command(self, cmd, params=None, callback=None, raw=False):
         '''
         Execute a command and return a parsed response.
         '''
-        def execute_with_callbacks(cmd, params=None, callback=None):
-            code, params = self.send_command(cmd, params)
+        def execute_with_callbacks(cmd, params=None, callback=None, raw=False):
+            code, params = self.send_command(cmd, params, raw)
             if callback:
                 callback(code, params)
             return code, params
 
         if self.daemon:
             t = Thread(target=execute_with_callbacks,
-                    args=(cmd, ), kwargs={'params':params, 'callback':callback})
+                    args=(cmd, ), kwargs={'params':params, 'callback':callback, 'raw':raw})
             t.daemon = True
             t.start()
         else:
-            return execute_with_callbacks(cmd, params, callback)
+            return execute_with_callbacks(cmd, params, callback, raw)
 
     # *************** Network ******************
 
@@ -407,6 +411,42 @@ class FoscamCamera(object):
         '''
         return self.execute_command('getDevState', callback=callback)
 
+    def open_infra_led(self, callback=None):
+        '''
+        Force open infra led
+        cmd: openInfraLed
+        '''
+        return self.execute_command("openInfraLed", {}, callback=callback)
+
+    def close_infra_led(self, callback=None):
+        '''
+        Force close infra led
+        cmd: closeInfraLed
+        '''
+        return self.execute_command("closeInfraLed", callback=callback)
+
+    def get_infra_led_config(self, callback=None):
+        '''
+        Get Infrared LED configuration
+        cmd: getInfraLedConfig
+        '''
+        return self.execute_command("getInfraLedConfig", callback=callback)
+
+    def set_infra_led_config(self, mode, callback=None):
+        '''
+        Set Infrared LED configuration
+        cmd: setInfraLedConfig
+        mode(0,1): 0=Auto mode, 1=Manual mode
+        '''
+        params = {'mode': mode}
+        return self.execute_command("setInfraLedConfig", params, callback=callback)
+
+    def get_product_all_info(self, callback=None):
+        '''
+        Get camera information
+        cmd: getProductAllInfo
+        '''
+        return self.execute_command("getProductAllInfo", callback=callback)
 
     # *************** PTZ Control *******************
 
@@ -513,6 +553,12 @@ class FoscamCamera(object):
                                     {'mode':mode},
                                     callback=callback
                                    )
+
+    def get_ptz_preset_point_list(self, callback=None):
+        '''
+        Get the preset list.
+        '''
+        return self.execute_command('getPTZPresetPointList', {}, callback=callback)
 
     
     # *************** AV Function *******************
@@ -658,3 +704,25 @@ class FoscamCamera(object):
         '''
         params = {'Path': path}
         return self.execute_command('setRecordPath', params, callback=callback)
+
+    # *************** SnapPicture Function *******************
+
+    def snap_picture_2(self, callback=None):
+        '''
+        Manually request snapshot. Returns raw JPEG data.
+        cmd: snapPicture2     
+        '''
+        return self.execute_command('snapPicture2', {}, callback=callback, raw=True)
+
+    # ********************** Misc ****************************
+
+    def get_log(self, offset, count=10, callback=None):
+        '''
+        Retrieve log records from camera.
+        cmd: getLog
+        param:
+           offset: log offset for first record
+           count: number of records to return
+        '''     
+        params = {'offset': offset, 'count': count}
+        return self.execute_command('getLog', params, callback=callback)
