@@ -1,15 +1,26 @@
 import unittest
 import os
+import os.path
 from time import sleep
+import ConfigParser
 
 from foscam import FoscamCamera
 
-CAM_HOST      = ''
-CAM_PORT      = 88
-CAM_USER      = 'admin'
-CAM_PASS      = 'foscam'
-CAM_WIFI_SSID = ''
-CAM_WIFI_PASS = ''
+config = ConfigParser.SafeConfigParser()
+config_filepath = os.path.join(os.path.dirname(__file__), "camtest.cfg")
+
+if os.path.exists(config_filepath):
+    config.read([config_filepath])
+
+config_defaults = config.defaults()
+
+CAM_HOST      = config_defaults.get('host') or ''
+CAM_PORT      = config_defaults.get('port') or 88
+CAM_USER      = config_defaults.get('user') or 'admin'
+CAM_PASS      = config_defaults.get('pass') or 'foscam'
+CAM_WIFI_SSID = config_defaults.get('wifi_ssid') or ''
+CAM_WIFI_PASS = config_defaults.get('wifi_pass') or ''
+
 
 class TestFoscam(unittest.TestCase):
 
