@@ -416,21 +416,21 @@ class FoscamCamera(object):
         Force open infra led
         cmd: openInfraLed
         '''
-        return self.execute_command("openInfraLed", {}, callback=callback)
+        return self.execute_command('openInfraLed', {}, callback=callback)
 
     def close_infra_led(self, callback=None):
         '''
         Force close infra led
         cmd: closeInfraLed
         '''
-        return self.execute_command("closeInfraLed", callback=callback)
+        return self.execute_command('closeInfraLed', callback=callback)
 
     def get_infra_led_config(self, callback=None):
         '''
         Get Infrared LED configuration
         cmd: getInfraLedConfig
         '''
-        return self.execute_command("getInfraLedConfig", callback=callback)
+        return self.execute_command('getInfraLedConfig', callback=callback)
 
     def set_infra_led_config(self, mode, callback=None):
         '''
@@ -439,14 +439,14 @@ class FoscamCamera(object):
         mode(0,1): 0=Auto mode, 1=Manual mode
         '''
         params = {'mode': mode}
-        return self.execute_command("setInfraLedConfig", params, callback=callback)
+        return self.execute_command('setInfraLedConfig', params, callback=callback)
 
     def get_product_all_info(self, callback=None):
         '''
         Get camera information
         cmd: getProductAllInfo
         '''
-        return self.execute_command("getProductAllInfo", callback=callback)
+        return self.execute_command('getProductAllInfo', callback=callback)
 
     # *************** PTZ Control *******************
 

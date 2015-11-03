@@ -7,7 +7,7 @@ import ConfigParser
 from foscam import FoscamCamera, FOSCAM_SUCCESS
 
 config = ConfigParser.SafeConfigParser()
-config_filepath = os.path.join(os.path.dirname(__file__), "camtest.cfg")
+config_filepath = os.path.join(os.path.dirname(__file__), 'camtest.cfg')
 
 if os.path.exists(config_filepath):
     config.read([config_filepath])
@@ -309,7 +309,7 @@ class TestFoscam(unittest.TestCase):
 
     def test_get_ptz_preset_point_list(self):
         rc, args = self.foscam.get_ptz_preset_point_list()
-        self.assertTrue("point0" in args)
+        self.assertTrue('point0' in args)
 
     # ******************* Other *****************************
     def test_unblocked_execute(self):
