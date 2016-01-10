@@ -411,6 +411,13 @@ class FoscamCamera(object):
         '''
         return self.execute_command('getDevState', callback=callback)
 
+    def get_dev_info(self, callback=None):
+        '''
+        Get camera information
+        cmd: getDevInfo
+        '''
+        return self.execute_command('getDevInfo', callback=callback)
+
     def open_infra_led(self, callback=None):
         '''
         Force open infra led
