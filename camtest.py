@@ -206,6 +206,10 @@ class TestFoscam(unittest.TestCase):
         rc, args = self.foscam.get_dev_state()
         self.assertEqual(rc, 0)
 
+    def test_dev_info(self):
+        rc, args = self.foscam.get_dev_info()
+        self.assertEqual(rc, 0)
+
     def test_open_infra_led(self):
         rc, args = self.foscam.open_infra_led()
         self.assertEqual(rc, 0)
