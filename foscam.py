@@ -1,8 +1,18 @@
 """
 A module to exploit Foscam Foscam FI9821W/P/HD816W/P camera.
+
+2016-01-22 Python 3 update by https://github.com/markomanninen
 """
 
-import urllib
+# Python 3 support. Also print -> print().
+try:
+    from urllib import urlopen
+except ImportError:
+    from urllib.request import urlopen
+try:
+    from urllib import urlencode
+except ImportError:
+    from urllib.parse import urlencode
 import xml.etree.ElementTree as ET
 from threading import Thread
 
@@ -49,7 +59,7 @@ class FoscamCamera(object):
         '''
         paramstr = ''
         if params:
-            paramstr = urllib.urlencode(params)
+            paramstr = urlencode(params)
             paramstr = '&' + paramstr if paramstr else ''
         cmdurl = 'http://%s/cgi-bin/CGIProxy.fcgi?usr=%s&pwd=%s&cmd=%s%s' % (
                                                                   self.url,
@@ -61,18 +71,18 @@ class FoscamCamera(object):
 
         # Parse parameters from response string.
         if self.verbose:
-            print 'Send Foscam command: %s' % cmdurl
+            print ('Send Foscam command: %s' % cmdurl)
         try:
             raw_string = ''
-            raw_string = urllib.urlopen(cmdurl).read()
+            raw_string = urlopen(cmdurl).read()
             if raw:
                 if self.verbose:
-                    print 'Returning raw Foscam response: len=%d' % len(raw_string)
+                    print ('Returning raw Foscam response: len=%d' % len(raw_string))
                 return FOSCAM_SUCCESS, raw_string
             root = ET.fromstring(raw_string)
         except:
             if self.verbose:
-                print 'Foscam exception: ' + raw_string
+                print ('Foscam exception: ' + raw_string)
             return ERROR_FOSCAM_UNAVAILABLE, None
         code = ERROR_FOSCAM_UNKNOWN
         params = dict()
@@ -84,7 +94,7 @@ class FoscamCamera(object):
                 params[child.tag] = child.text
 
         if self.verbose:
-            print 'Received Foscam response: %s, %s' % (code, params)
+            print ('Received Foscam response: %s, %s' % (code, params))
         return code, params
 
     def execute_command(self, cmd, params=None, callback=None, raw=False):
