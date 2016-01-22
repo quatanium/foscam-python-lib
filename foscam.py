@@ -526,13 +526,13 @@ class FoscamCamera(object):
         Reset PT to default position.
         '''
         return self.execute_command('ptzReset', callback=callback)
-    
+
     def ptz_get_preset(self, callback=None):
         '''
         Get presets.
         '''
         return self.execute_command('getPTZPresetPointList', callback=callback)
-    
+
     def ptz_goto_preset(self, name, callback=None):
         '''
         Move to preset.
@@ -577,14 +577,14 @@ class FoscamCamera(object):
         '''
         return self.execute_command('getPTZPresetPointList', {}, callback=callback)
 
-    
+
     # *************** AV Function *******************
     def get_motion_detect_config(self, callback=None):
         '''
         Get motion detect config
         '''
         return self.execute_command('getMotionDetectConfig', callback=callback)
- 
+
     def set_motion_detect_config(self, params, callback=None):
         '''
         Get motion detect config
@@ -727,7 +727,7 @@ class FoscamCamera(object):
     def snap_picture_2(self, callback=None):
         '''
         Manually request snapshot. Returns raw JPEG data.
-        cmd: snapPicture2     
+        cmd: snapPicture2
         '''
         return self.execute_command('snapPicture2', {}, callback=callback, raw=True)
 
@@ -740,6 +740,6 @@ class FoscamCamera(object):
         param:
            offset: log offset for first record
            count: number of records to return
-        '''     
+        '''
         params = {'offset': offset, 'count': count}
         return self.execute_command('getLog', params, callback=callback)
