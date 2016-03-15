@@ -46,3 +46,9 @@ This example illustrates the use of a callback function when the command complet
     mycam = FoscamCamera('192.168.0.110', 88, 'admin', 'foscam', daemon=False)
     mycam.get_ip_info(print_ipinfo)
 ```
+
+### Command line utility:
+Call this to get back status of a camera as a json response. (Useful to add into as a command line sensor to Home-Assistant)
+```bash
+    foscmd -H 192.168.1.90 -P 88 -u texnofobix -p mypass
+```
