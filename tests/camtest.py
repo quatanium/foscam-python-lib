@@ -1,12 +1,15 @@
-import unittest
-import os
 import os.path
+import unittest
 from time import sleep
-import ConfigParser
 
-from foscam import FoscamCamera, FOSCAM_SUCCESS
+try:  # PY3
+    from configparser import ConfigParser
+except ImportError:
+    from ConfigParser import SafeConfigParser as ConfigParser
 
-config = ConfigParser.SafeConfigParser()
+from foscam.foscam import FoscamCamera, FOSCAM_SUCCESS
+
+config = ConfigParser()
 config_filepath = os.path.join(os.path.dirname(__file__), 'camtest.cfg')
 
 if os.path.exists(config_filepath):
@@ -14,20 +17,21 @@ if os.path.exists(config_filepath):
 
 config_defaults = config.defaults()
 
-CAM_HOST      = config_defaults.get('host') or ''
-CAM_PORT      = config_defaults.get('port') or 88
-CAM_USER      = config_defaults.get('user') or 'admin'
-CAM_PASS      = config_defaults.get('pass') or 'foscam'
+CAM_HOST = config_defaults.get('host') or ''
+CAM_PORT = config_defaults.get('port') or 88
+CAM_USER = config_defaults.get('user') or 'admin'
+CAM_PASS = config_defaults.get('pass') or 'foscam'
 CAM_WIFI_SSID = config_defaults.get('wifi_ssid') or ''
 CAM_WIFI_PASS = config_defaults.get('wifi_pass') or ''
+
 
 class CallbackForTest(object):
     def __call__(self, *args, **kwargs):
         self.args = args
-        self.kwargs = kwargs;
+        self.kwargs = kwargs
+
 
 class TestFoscam(unittest.TestCase):
-
     def setUp(self):
         self.foscam = FoscamCamera(CAM_HOST, CAM_PORT, CAM_USER, CAM_PASS)
 
@@ -53,7 +57,7 @@ class TestFoscam(unittest.TestCase):
     def test_video_stream_param(self):
         self.foscam.get_main_video_stream_type()
         self.foscam.get_video_stream_param()
-        self.foscam.set_video_stream_param(0, 0, 2*1024*1024, 30, 30, 1)
+        self.foscam.set_video_stream_param(0, 0, 2 * 1024 * 1024, 30, 30, 1)
         self.foscam.get_video_stream_param()
 
     def test_mirror_video(self):
@@ -76,27 +80,25 @@ class TestFoscam(unittest.TestCase):
         rc, args = self.foscam.get_mirror_and_flip_setting()
         self.assertEqual(rc, 0)
 
-
     # ***************** Test Network Functions *********************
     def test_get_ip_info(self):
         rc, info = self.foscam.get_ip_info()
         self.assertTrue(rc == 0)
 
-
     # ***************** Test Network Functions *********************
     def test_set_ip_info(self):
         old = self.foscam.get_ip_info()
-        self.foscam.set_ip_info(is_dhcp=0, ip='192.168.0.110', \
-                gate='192.168.0.1', mask='255.255.255.0', \
-                dns1='192.168.0.1', dns2='8.8.8.8')
+        self.foscam.set_ip_info(is_dhcp=0, ip='192.168.0.110',
+                                gate='192.168.0.1', mask='255.255.255.0',
+                                dns1='192.168.0.1', dns2='8.8.8.8')
         # Wait to reboot.
         sleep(30)
         self.foscam.get_ip_info()
 
     def test_set_port(self):
         rc, args = self.foscam.get_port_info()
-        rc, args = self.foscam.set_port_info(webport=88, mediaport=88, \
-                httpsport=443, onvifport=888)
+        rc, args = self.foscam.set_port_info(webport=88, mediaport=88,
+                                             httpsport=443, onvifport=888)
         self.assertEqual(rc, 0)
         rc, args = self.foscam.get_port_info()
 
@@ -111,15 +113,15 @@ class TestFoscam(unittest.TestCase):
         self.foscam.get_wifi_config()
 
         self.foscam.set_wifi_setting(
-                ssid=CAM_WIFI_SSID,
-                psk=CAM_WIFI_PASS,
-                isenable=0,
-                isusewifi=0,
-                nettype=0,
-                encryptype=4,
-                authmode=1,
-                keyformat=0,
-                defaultkey=1)
+            ssid=CAM_WIFI_SSID,
+            psk=CAM_WIFI_PASS,
+            isenable=0,
+            isusewifi=0,
+            nettype=0,
+            encryptype=4,
+            authmode=1,
+            keyformat=0,
+            defaultkey=1)
 
     # *************** PTZ Move ********************************
 
@@ -194,7 +196,7 @@ class TestFoscam(unittest.TestCase):
                                     hour=args['hour'],
                                     minute=args['minute'],
                                     sec=args['sec'],
-                                   )
+                                    )
 
     def test_devname(self):
         args = self.foscam.get_dev_name()
@@ -234,43 +236,43 @@ class TestFoscam(unittest.TestCase):
     # ************ Test AV Function *************************
 
     def test_get_alarm_record_config(self):
-        print self.foscam.get_alarm_record_config()
+        print(self.foscam.get_alarm_record_config())
 
     def test_set_alarm_record_config(self):
         rc, old_args = self.foscam.get_alarm_record_config()
         new_args = {'isEnablePreRecord': 1,
-                    'alarmRecordSecs'  : 240,
-                    'preRecordSecs'    : 5
-                }
+                    'alarmRecordSecs': 240,
+                    'preRecordSecs': 5
+                    }
         self.foscam.set_alarm_record_config(
-                alarm_record_secs=new_args['alarmRecordSecs'],
-                prerecord_secs=new_args['preRecordSecs'])
+            alarm_record_secs=new_args['alarmRecordSecs'],
+            prerecord_secs=new_args['preRecordSecs'])
 
         rc, args = self.foscam.get_alarm_record_config()
         self.assertTrue(rc == 0)
-        self.assertTrue(int(args['alarmRecordSecs']) == \
-                                new_args['alarmRecordSecs'])
-        self.assertTrue(int(args['preRecordSecs']) == \
-                                new_args['preRecordSecs'])
+        self.assertTrue(int(args['alarmRecordSecs']) ==
+                        new_args['alarmRecordSecs'])
+        self.assertTrue(int(args['preRecordSecs']) ==
+                        new_args['preRecordSecs'])
 
         self.foscam.set_alarm_record_config(
-                alarm_record_secs=old_args['alarmRecordSecs'],
-                prerecord_secs=old_args['preRecordSecs'])
+            alarm_record_secs=old_args['alarmRecordSecs'],
+            prerecord_secs=old_args['preRecordSecs'])
 
     def test_get_local_alarm_record_config(self):
         rc, args = self.foscam.get_local_alarm_record_config()
-        self.assertTrue(set(args) == set(['isEnableLocalAlarmRecord',
-                                          'localAlarmRecordSecs']))
+        self.assertTrue(set(args) == {'isEnableLocalAlarmRecord',
+                                      'localAlarmRecordSecs'})
 
     def test_set_local_alarm_recor_config(self):
         rc, args = self.foscam.set_local_alarm_record_config(
-                is_enable_local_alarm_record=1,
-                local_alarm_record_secs=60)
+            is_enable_local_alarm_record=1,
+            local_alarm_record_secs=60)
         self.assertTrue(rc == 0)
         rc, args = self.foscam.get_local_alarm_record_config()
-        self.assertTrue(rc == 0  \
-                        and args['isEnableLocalAlarmRecord'] == '1' \
-                        and args['localAlarmRecordSecs'] == '60')
+        self.assertTrue(all([rc == 0,
+                             args['isEnableLocalAlarmRecord'] == '1',
+                             args['localAlarmRecordSecs'] == '60']))
 
     def test_get_h264_frm_ref_mode(self):
         rc, args = self.foscam.get_h264_frm_ref_mode()
@@ -286,24 +288,24 @@ class TestFoscam(unittest.TestCase):
         self.assertEqual(args['mode'], str(mode))
 
     def test_get_schedule_record_config(self):
-        all_args = set(['isEnable', 'isEnableAudio', 'recordLevel',
-                        'schedule0', 'schedule1', 'schedule2',
-                        'schedule3', 'schedule4', 'schedule5',
-                        'schedule6', 'spaceFullMode'])
+        all_args = {'isEnable', 'isEnableAudio', 'recordLevel',
+                    'schedule0', 'schedule1', 'schedule2',
+                    'schedule3', 'schedule4', 'schedule5',
+                    'schedule6', 'spaceFullMode'}
         rc, args = self.foscam.get_schedule_record_config()
         self.assertTrue(rc == 0)
         self.assertTrue(set(args) == all_args)
 
     def test_set_schedule_record_config(self):
-        rc, args =  self.foscam.set_schedule_record_config(
-                            is_enable=1, record_level=4,
-                            space_full_mode=0, is_enable_audio=0)
+        rc, args = self.foscam.set_schedule_record_config(
+            is_enable=1, record_level=4,
+            space_full_mode=0, is_enable_audio=0)
         self.assertTrue(rc == 0)
 
     def test_get_record_path(self):
         rc, args = self.foscam.get_record_path()
         self.assertTrue(rc == 0)
-        self.assertTrue(set(args) == set(['path', 'free', 'total']))
+        self.assertTrue(set(args) == {'path', 'free', 'total'})
 
     def test_set_record_path(self):
         rc, args = self.foscam.get_record_path()
@@ -317,7 +319,7 @@ class TestFoscam(unittest.TestCase):
 
     # ******************* Other *****************************
     def test_unblocked_execute(self):
-        self.foscam.daemon=True
+        self.foscam.daemon = True
         self.foscam.ptz_move_up()
         sleep(0.5)
         self.foscam.ptz_stop_run()
@@ -328,22 +330,22 @@ class TestFoscam(unittest.TestCase):
                 f.write(str(args))
                 f.write(str(kwargs))
 
-        self.foscam.daemon=True
+        self.foscam.daemon = True
         self.foscam.get_ip_info(print_res)
         timeout = 10
         flag = False
         while timeout >= 0:
             try:
-                with open('temp.txt', 'r') as f:
-                    self.assertTrue(open('temp.txt', 'r').read() != '')
+                with open('temp.txt', 'r') as new_f:
+                    self.assertTrue(new_f.read() != '')
                     flag = True
                     break
-            except Exception:
+            except Exception as e:
+                print(e)
                 pass
             sleep(0.5)
             timeout -= 0.5
         self.assertTrue(flag)
-
 
     # *************** SnapPicture Function *******************
 
@@ -356,7 +358,6 @@ class TestFoscam(unittest.TestCase):
             fp.write(data)
         self.assertSequenceEqual(callback.args, (rc, data))
 
-
     # ********************** Misc ****************************
 
     def test_get_log(self):
@@ -366,6 +367,7 @@ class TestFoscam(unittest.TestCase):
         self.assertEqual(rc, FOSCAM_SUCCESS)
         self.assertTrue('log0' in args)
         self.assertSequenceEqual(callback.args, (rc, args))
+
 
 if __name__ == '__main__':
     unittest.main()
