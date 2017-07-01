@@ -21,7 +21,7 @@ Install
 
 .. code:: bash
 
-  pip install pyfoscam
+  $ pip install pyfoscam
 
 Simple example
 --------------
