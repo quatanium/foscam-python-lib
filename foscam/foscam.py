@@ -15,6 +15,11 @@ except ImportError:
     from urllib.parse import urlencode
 import xml.etree.ElementTree as ET
 from threading import Thread
+try:
+    import ssl
+    ssl_enabled=True
+except ImportError:
+    ssl_enabled=False
 
 # Foscam error code.
 FOSCAM_SUCCESS           = 0
@@ -37,7 +42,7 @@ class FoscamError(Exception):
 class FoscamCamera(object):
     '''A python implementation of the foscam HD816W'''
 
-    def __init__(self, host, port, usr, pwd, daemon=False, verbose=True):
+    def __init__(self, host, port, usr, pwd, daemon=False, ssl=None, verbose=True):
         '''
         If ``daemon`` is True, the command will be sent unblockedly.
         '''
@@ -47,6 +52,12 @@ class FoscamCamera(object):
         self.pwd = pwd
         self.daemon = daemon
         self.verbose = verbose
+        self.ssl = ssl
+        if ssl_enabled:
+            if port==443 and ssl is None:
+                self.ssl = True
+        if self.ssl is None:
+            self.ssl = False
 
     @property
     def url(self):
@@ -68,13 +79,19 @@ class FoscamCamera(object):
                                                                   cmd,
                                                                   paramstr,
                                                                   )
+        if self.ssl and ssl_enabled:
+            cmdurl = cmdurl.replace('http:','https:')
 
         # Parse parameters from response string.
         if self.verbose:
             print ('Send Foscam command: %s' % cmdurl)
         try:
             raw_string = ''
-            raw_string = urlopen(cmdurl).read()
+            if self.ssl and ssl_enabled:
+                gcontext = ssl.SSLContext(ssl.PROTOCOL_TLSv1)  # disable cert
+                raw_string = urlopen(cmdurl,context=gcontext).read()
+            else:
+                raw_string = urlopen(cmdurl).read()
             if raw:
                 if self.verbose:
                     print ('Returning raw Foscam response: len=%d' % len(raw_string))
