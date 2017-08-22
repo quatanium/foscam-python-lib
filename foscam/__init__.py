@@ -1,2 +1,2 @@
-from foscam import FoscamCamera
+from .foscam import FoscamCamera
 
