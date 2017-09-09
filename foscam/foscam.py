@@ -633,6 +633,40 @@ class FoscamCamera(object):
         result = self.set_motion_detection(0)
         return result
 
+	# These API calls support FI9900P devices, which use a different CGI command
+    def get_motion_detect_config1(self, callback=None):
+        '''
+        Get motion detect config
+        '''
+        return self.execute_command('getMotionDetectConfig1', callback=callback)
+
+    def set_motion_detect_config1(self, params, callback=None):
+        '''
+        Get motion detect config
+        '''
+        return self.execute_command('setMotionDetectConfig1', params, callback=callback)
+
+    def set_motion_detection1(self, enabled=1):
+        '''
+        Get the current config and set the motion detection on or off
+        '''
+        result, current_config = self.get_motion_detect_config1()
+        current_config['isEnable'] = enabled
+        self.set_motion_detect_config1(current_config)
+
+    def enable_motion_detection1(self):
+        '''
+        Enable motion detection
+        '''
+        self.set_motion_detection1(1)
+
+    def disable_motion_detection1(self):
+        '''
+        disable motion detection
+        '''
+        self.set_motion_detection1(0)
+
+		
     def get_alarm_record_config(self, callback=None):
         '''
         Get alarm record config
@@ -765,3 +799,5 @@ class FoscamCamera(object):
         '''
         params = {'offset': offset, 'count': count}
         return self.execute_command('getLog', params, callback=callback)
+		
+
