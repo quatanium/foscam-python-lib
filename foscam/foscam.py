@@ -13,6 +13,11 @@ try:
     from urllib import urlencode
 except ImportError:
     from urllib.parse import urlencode
+try:
+    from urllib import unquote
+except ImportError:
+    from urllib.parse import unquote
+
 import xml.etree.ElementTree as ET
 from threading import Thread
 try:
@@ -108,7 +113,7 @@ class FoscamCamera(object):
                 code = int(child.text)
 
             elif child.tag != 'CGI_Result':
-                params[child.tag] = child.text
+                params[child.tag] = unquote(child.text)
 
         if self.verbose:
             print ('Received Foscam response: %s, %s' % (code, params))
@@ -633,7 +638,7 @@ class FoscamCamera(object):
         result = self.set_motion_detection(0)
         return result
 
-	# These API calls support FI9900P devices, which use a different CGI command
+    # These API calls support FI9900P devices, which use a different CGI command
     def get_motion_detect_config1(self, callback=None):
         '''
         Get motion detect config
@@ -666,7 +671,7 @@ class FoscamCamera(object):
         '''
         self.set_motion_detection1(0)
 
-		
+        
     def get_alarm_record_config(self, callback=None):
         '''
         Get alarm record config
@@ -786,7 +791,21 @@ class FoscamCamera(object):
         cmd: snapPicture2
         '''
         return self.execute_command('snapPicture2', {}, callback=callback, raw=True)
-
+        
+    # ******************* SMTP Functions *********************
+    
+    def set_smtp_config(self, params, callback=None):
+        '''
+        Set smtp settings using the array of parameters 
+        '''
+        return self.execute_command('setSMTPConfig', params, callback=callback)
+        
+    def get_smtp_config(self, callback=None):
+        '''
+        Get smtp settings using the array of parameters 
+        '''
+        return self.execute_command('getSMTPConfig', callback=callback)
+        
     # ********************** Misc ****************************
 
     def get_log(self, offset, count=10, callback=None):
@@ -799,5 +818,5 @@ class FoscamCamera(object):
         '''
         params = {'offset': offset, 'count': count}
         return self.execute_command('getLog', params, callback=callback)
-		
+        
 
