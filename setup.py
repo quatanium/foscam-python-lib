@@ -25,7 +25,7 @@ CLASSIFIERS = [
 
 setup(
     name='pyfoscam',
-    version='1.2',
+    version='1.2.1',
     description='Foscam Python Library for H.264 IP Cameras (FI9821W/P/HD816W/P)',
     long_description=open('README.rst', 'r').read(),
     author='Cherish Chen',
