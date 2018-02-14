@@ -6,9 +6,9 @@ A module to exploit Foscam Foscam FI9821W/P/HD816W/P camera.
 
 # Python 3 support. Also print -> print().
 try:
-    from urllib import urlopen
+    from urllib import urlopen    
 except ImportError:
-    from urllib.request import urlopen
+    from urllib.request import urlopen   
 try:
     from urllib import urlencode
 except ImportError:
@@ -25,6 +25,8 @@ try:
     ssl_enabled=True
 except ImportError:
     ssl_enabled=False
+
+from collections import OrderedDict
 
 # Foscam error code.
 FOSCAM_SUCCESS           = 0
@@ -107,7 +109,7 @@ class FoscamCamera(object):
                 print ('Foscam exception: ' + raw_string)
             return ERROR_FOSCAM_UNAVAILABLE, None
         code = ERROR_FOSCAM_UNKNOWN
-        params = dict()
+        params = OrderedDict()
         for child in root.iter():
             if child.tag == 'result':
                 code = int(child.text)
