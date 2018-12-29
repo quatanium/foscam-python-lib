@@ -824,7 +824,12 @@ class FoscamCamera(object):
         Set ftp settings using the array of parameters (PASV: 0, PORT: 1)
         '''
         encoded_password = ",".join([str(ord(x)) for x in list(password)])
-        params = {'ftpAddr': address, 'ftpPort': str(port), 'mode': str(port), 'userName': username, 'password': encoded_password}
+        params = {'ftpAddr': address,
+                  'ftpPort': str(port),
+                  'mode': str(port),
+                  'userName': username,
+                  'password': encoded_password
+                  }
         return self.execute_command('setFtpConfigNew', params, callback=callback)
 
     def get_ftp_config(self, callback=None):
@@ -838,7 +843,12 @@ class FoscamCamera(object):
         Get ftp settings using the array of parameters (PASV: 0, PORT: 1)
         '''
         encoded_password = ",".join([str(ord(x)) for x in list(password)])
-        params = {'ftpAddr': address, 'ftpPort': str(port), 'mode': str(port), 'fptUserName': username, 'ftpPassword': encoded_password}
+        params = {'ftpAddr': address,
+                  'ftpPort': str(port),
+                  'mode': str(port),
+                  'fptUserName': username,
+                  'ftpPassword': encoded_password
+                  }
         return self.execute_command('testFtpServerNew', params, callback=callback)
 
     # ********************** Misc ****************************
