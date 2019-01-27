@@ -104,9 +104,9 @@ class FoscamCamera(object):
             raw_string = ''
             if self.ssl and ssl_enabled:
                 gcontext = ssl.SSLContext(ssl.PROTOCOL_TLSv1)  # disable cert
-                raw_string = urlopen(cmdurl,context=gcontext).read()
+                raw_string = urlopen(cmdurl,context=gcontext, timeout=5).read()
             else:
-                raw_string = urlopen(cmdurl).read()
+                raw_string = urlopen(cmdurl,timeout=5).read()
             if raw:
                 if self.verbose:
                     print ('Returning raw Foscam response: len=%d' % len(raw_string))
@@ -668,6 +668,8 @@ class FoscamCamera(object):
         Get the current config and set the motion detection on or off
         '''
         result, current_config = self.get_motion_detect_config1()
+        if result != FOSCAM_SUCCESS:
+            return result
         current_config['isEnable'] = enabled
         self.set_motion_detect_config1(current_config)
 
