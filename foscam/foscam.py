@@ -123,10 +123,10 @@ class FoscamCamera(object):
                 code = int(child.text)
 
             elif child.tag != 'CGI_Result':
-                if type(child.text) == str:
-                    child.text = unquote(child.text)
-                params[child.tag] = child.text
-
+                if child.text:
+                    params[child.tag] = unquote(child.text)
+                else:
+                    params[child.tag] = ""
         if self.verbose:
             print ('Received Foscam response: %s, %s' % (code, params))
         return code, params
