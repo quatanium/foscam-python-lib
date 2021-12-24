@@ -228,6 +228,22 @@ class TestFoscam(unittest.TestCase):
         rc, args = self.foscam.set_infra_led_config(1)
         self.assertEqual(rc, 0)
 
+    def test_open_white_light(self):
+        rc, args = self.foscam.open_white_light()
+        self.assertEqual(rc, 0)
+
+    def test_close_white_light(self):
+        rc, args = self.foscam.close_white_light()
+        self.assertEqual(rc, 0)
+
+    def test_get_white_light_config(self):
+        rc, args = self.foscam.get_white_light_config()
+        self.assertEqual(rc, 0)
+
+    def test_set_white_light_config(self):
+        rc, args = self.foscam.set_white_light_config(2)
+        self.assertEqual(rc, 0)
+
     def test_get_product_all_info(self):
         rc, args = self.foscam.get_product_all_info()
         self.assertEqual(rc, 0)
