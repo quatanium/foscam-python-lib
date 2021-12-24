@@ -492,6 +492,45 @@ class FoscamCamera(object):
         params = {'mode': mode}
         return self.execute_command('setInfraLedConfig', params, callback=callback)
 
+    def open_white_light(self, callback=None):
+        '''
+        Force open white light, set manual mode first using set_white_light_config
+        cmd: openWhiteLight
+        '''
+        return self.execute_command('openWhiteLight', {}, callback=callback)
+
+    def close_white_light(self, callback=None):
+        '''
+        Force close white light, set manual mode first using set_white_light_config
+        cmd: closeWhiteLight
+        '''
+        return self.execute_command('closeWhiteLight', callback=callback)
+
+    def get_white_light_config(self, callback=None):
+        '''
+        Get White Light configuration
+        cmd: getWhiteLightConfig
+        '''
+        return self.execute_command('getWhiteLightConfig', callback=callback)
+
+    def set_white_light_config(self, lightmode, callback=None):
+        '''
+        Set White Light configuration
+        cmd: setWhiteLightConfig
+        Lightmode(0,1): 0=Auto mode, 1=?, 2=Manual mode
+        '''
+        params = {'Lightmode': lightmode}
+        return self.execute_command('setWhiteLightConfig', params, callback=callback)
+
+    def set_night_light_state(self, state, callback=None):
+        '''
+        Set Night Light state
+        cmd: setNightLightState
+        state(0,1): 0=Off, 1=On
+        '''
+        params = {'state': state}
+        return self.execute_command('setNightLightState', params, callback=callback)
+
     def get_product_all_info(self, callback=None):
         '''
         Get camera information
